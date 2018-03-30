@@ -140,5 +140,31 @@ namespace SGBaseDatos
         {
             Application.Exit();
         }
+        /// <summary>
+        /// Método para crear los items del menú cuando se le da click derecho
+        /// </summary>
+        /// <param name="nomVariable">string con el nombre de la variable que se le quiere dar al item</param>
+        /// <param name="nombre">string con el nombre que se le va a dar a la opción</param>
+        /// <returns>ToolStripMenuItem con el item que se creo y se le agregara al contextMenuStrip</returns>
+        public ToolStripMenuItem CrearOpcion(string nomVariable, string nombre)
+        {
+            ToolStripMenuItem item = new ToolStripMenuItem();
+            cmsOpciones.Items.AddRange(new ToolStripItem[] {
+                item});
+            item.Name = nomVariable;
+            item.Size = new Size(138, 24);
+            item.Text = nombre;
+            return item;
+        }
+        private void Click_NodoEscogido(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            cmsOpciones.Items.Clear();
+            if (e.Node.Text == "DataBases")
+            {
+                CrearOpcion("agregarMenuItem", "Agregar");
+                CrearOpcion("eliminarMenuItem", "Eliminar");
+                CrearOpcion("modificarMenuItem", "modificar");
+            }
+        }
     }
 }
