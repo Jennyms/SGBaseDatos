@@ -16,6 +16,13 @@ namespace SGBaseDatos
     public partial class FrmVista : Form
     {
         private ConexionBOL bol;
+        private ArrayList listaBD;
+        private ArrayList listaUsersBD;
+        private ArrayList listaTableSpaceBD;
+        private string nombre;
+        private string nombreSchemas;
+        private string nombreRol;
+
         public FrmVista()
         {
             InitializeComponent();
@@ -28,8 +35,16 @@ namespace SGBaseDatos
             gbQuery.Visible = false;
             if (Usuario.Activo)
             {
+                CargarListas();
                 CargarTodo();
             }
+        }
+
+        public void CargarListas()
+        {
+            listaBD = bol.CargarBD();
+            listaUsersBD = bol.CargarUserBD();
+            listaTableSpaceBD = bol.CargarTableSpaceBD();
         }
 
         private void tvServers_DoubleClick(object sender, EventArgs e)
@@ -51,9 +66,7 @@ namespace SGBaseDatos
                 tvSGBD.Nodes[0].Nodes[0].Nodes.Add("DataBases");
                 tvSGBD.Nodes[0].Nodes[0].Nodes.Add("Login/Group Roles");
                 tvSGBD.Nodes[0].Nodes[0].Nodes.Add("Tablespace");
-                ArrayList listaBD = bol.CargarBD();
-                ArrayList listaUsersBD = bol.CargarUserBD();
-                ArrayList listaTableSpaceBD = bol.CargarTableSpaceBD();
+                CargarListas();
                 //Base de Datos
                 for (int i = 0; i < listaBD.Count; i++)
                 {
@@ -154,17 +167,195 @@ namespace SGBaseDatos
             item.Name = nomVariable;
             item.Size = new Size(138, 24);
             item.Text = nombre;
+            item.Click += new System.EventHandler(MouseClickItem);
             return item;
         }
+
+        private void MouseClickItem(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+            if (item.Name == "agregarItemDB" || item.Name == "refrescarItemDB")
+            {
+                OpcionDB(item.Text);
+            }
+
+            else if (item.Name == "querItemDBs" || item.Name == "eliminarItemDBs" || item.Name == "refrescarItemDBs")
+            {
+                OpcionesDB(item.Text);
+            }
+
+            else if (item.Name == "agregarSchemas" || item.Name == "eliminarSchemas" || item.Name == "refrescarSchemas")
+            {
+                OpcionesSchemasDB(item.Text);
+            }
+
+            else if (item.Name == "agregarRoles")
+            {
+                OpcionesRol(item.Text);
+            }
+
+            else if (item.Name == "modificarRol" || item.Name == "eliminarRol")
+            {
+                OpcionesRoles(item.Text);
+            }
+        }
+
+        public void OpcionesSchemasDB(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "CREATE SCHEMA ingreseElNombre";
+                    break;
+                case "Elimminar":
+                    txtQuery.Text = "DROP SCHEMA " + nombreSchemas;
+                    break;
+                case "Refrescar":
+                    gbQuery.Visible = true;
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    CargarTodo();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        public void OpcionDB(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "CREATE DATABASE ingreseElNombre";
+                    break;
+                case "Refrescar":
+                    gbQuery.Visible = true;
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    gbQuery.Visible = false;
+                    CargarTodo();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void OpcionesDB(string item)
+        {
+            switch (item)
+            {
+                case "Query":
+                    gbQuery.Visible = true;
+                    break;
+                case "Elimminar":
+                    txtQuery.Text = "DROP DATABASE " + nombre;
+                    break;
+                case "Refrescar":
+                    gbQuery.Visible = true;
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    CargarTodo();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void OpcionesRol(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "CREATE ROLE rolName  WITH SUPERUSER" + Environment.NewLine;
+                    txtQuery.Text += "CREATE USER userName WITH PASSWORD ' '";
+                    break;
+                default:
+                    break;
+            }
+        }
+        public void OpcionesRoles(string item)
+        {
+            switch (item)
+            {
+                case "Elimminar":
+                    txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
+                    txtQuery.Text += "DROP ROLE " + nombreRol;
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER ROLE " + nombreRol + " WITH LOGIN" + Environment.NewLine;
+                    txtQuery.Text += "ALTER USER " + nombreRol + " WITH PASSWORD ' '";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
         private void Click_NodoEscogido(object sender, TreeNodeMouseClickEventArgs e)
         {
             cmsOpciones.Items.Clear();
+            Console.WriteLine(e.Node.Name);
+
             if (e.Node.Text == "DataBases")
             {
-                CrearOpcion("agregarMenuItem", "Agregar");
-                CrearOpcion("eliminarMenuItem", "Eliminar");
-                CrearOpcion("modificarMenuItem", "modificar");
+                CrearOpcion("agregarItemDB", "Agregar");
+                CrearOpcion("refrescarItemDB", "Refrescar");
             }
+            if (listaBD != null)
+            {
+                for (int i = 0; i < listaBD.Count; i++)
+                {
+                    if (e.Node.Text == listaBD[i].ToString())
+                    {
+                        if(listaBD[i].ToString() != "postgres")
+                        {
+                            nombre = listaBD[i].ToString();
+                            CrearOpcion("querItemDBs", "Query");
+                            CrearOpcion("eliminarItemDBs", "Elimminar");
+                            CrearOpcion("refrescarItemDBs", "Refrescar");
+                        }
+                    }
+                }
+            }
+            if (e.Node.Text == "Schemas")
+            {
+                nombreSchemas = e.Node.Text;
+                CrearOpcion("agregarSchemas", "Agregar");
+                CrearOpcion("eliminarSchemas", "Elimminar");
+                CrearOpcion("refrescarSchemas", "Refrescar");
+            }
+            if (e.Node.Text == "Login/Group Roles")
+            {
+                nombreRol = e.Node.Text;
+                CrearOpcion("agregarRoles", "Agregar");
+            }
+            if(listaUsersBD != null)
+            {
+                for (int i = 0; i < listaUsersBD.Count; i++)
+                {
+                    if(e.Node.Text == listaUsersBD[i].ToString())
+                    {
+                        nombreRol = listaUsersBD[i].ToString();
+                        CrearOpcion("modificarRol", "Modificar");
+                        CrearOpcion("eliminarRol", "Elimminar");
+                    }
+                    
+                }
+            }
+            
+        }
+
+        private void Click_BtnPlay(object sender, EventArgs e)
+        {
+            MessageBox.Show(txtQuery.SelectedText);
         }
     }
 }
