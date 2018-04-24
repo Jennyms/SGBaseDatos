@@ -1,4 +1,5 @@
-﻿using SDBaseDatosDAL;
+﻿using Npgsql;
+using SDBaseDatosDAL;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +16,18 @@ namespace SDBaseDatosBOL
         public ConexionBOL()
         {
             dal = new ConexionDAL();
+        }
+        public string Query(string bd, string query)
+        {
+            if (String.IsNullOrEmpty(bd))
+            {
+                throw new Exception("Base de Datos requerida.");
+            }
+            if (String.IsNullOrEmpty(query))
+            {
+                throw new Exception("Query requerido.");
+            }
+            return dal.EjecutarQuery(bd, query);
         }
 
         public ArrayList CargarBD()
@@ -151,6 +164,19 @@ namespace SDBaseDatosBOL
                 throw new Exception("Password requerida.");
             }
             return dal.ConexionBD();
+        }
+
+        public NpgsqlDataAdapter SelectQuery(string bd, string query)
+        {
+            if (String.IsNullOrEmpty(bd))
+            {
+                throw new Exception("Base de Datos requerida.");
+            }
+            if (String.IsNullOrEmpty(query))
+            {
+                throw new Exception("Query requerido.");
+            }
+            return dal.SelectQuery(bd, query);
         }
     }
 }

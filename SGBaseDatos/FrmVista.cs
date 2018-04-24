@@ -2,14 +2,10 @@
 using SDBaseDatosENL;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Npgsql;
 
 namespace SGBaseDatos
 {
@@ -22,7 +18,8 @@ namespace SGBaseDatos
         private string nombre;
         private string nombreSchemas;
         private string nombreRol;
-        private string nombreTabla;
+        private DataSet ds;
+
         public FrmVista()
         {
             InitializeComponent();
@@ -179,7 +176,7 @@ namespace SGBaseDatos
                 OpcionDB(item.Text);
             }
 
-            else if (item.Name == "querItemDBs" || item.Name == "eliminarItemDBs" || item.Name == "refrescarItemDBs" || item.Name == "modificarItemDBs")
+            else if (item.Name == "queryItemDBs" || item.Name == "eliminarItemDBs" || item.Name == "refrescarItemDBs" || item.Name == "modificarItemDBs")
             {
                 OpcionesDB(item.Text);
             }
@@ -223,8 +220,12 @@ namespace SGBaseDatos
             {
                 OpcionesIndex(item.Text);
             }
+            else if (item.Name == "agregarColumns" || item.Name == "modificarColumns" || item.Name == "eliminarColumns")
+            {
+                OpcionesColumn(item.Text);
+            }
         }
-
+        //LISTO
         public void OpcionesSchemasDB(string item)
         {
             gbQuery.Visible = true;
@@ -232,13 +233,13 @@ namespace SGBaseDatos
             {
 
                 case "Agregar":
-                    txtQuery.Text = "CREATE SCHEMA ingreseElNombre";
+                    txtQuery.Text = "CREATE SCHEMA nomEsquema";
                     break;
                 case "Eliminar":
-                    txtQuery.Text = "DROP SCHEMA " + nombreSchemas;
+                    txtQuery.Text = "DROP SCHEMA nomEsquema";
                     break;
                 case "Modificar":
-                    txtQuery.Text = "ALTER SCHEMA " + nombreSchemas;
+                    txtQuery.Text = "ALTER SCHEMA nomEsquema RENAME TO nuevoNombre";
                     break;
                 case "Refrescar":
                     tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
@@ -299,7 +300,7 @@ namespace SGBaseDatos
                     break;
             }
         }
-
+        //LISTO
         public void OpcionesRol(string item)
         {
             switch (item)
@@ -313,6 +314,7 @@ namespace SGBaseDatos
                     break;
             }
         }
+        //LISTO
         public void OpcionesRoles(string item)
         {
             switch (item)
@@ -331,7 +333,7 @@ namespace SGBaseDatos
                     break;
             }
         }
-
+        //LISTO
         public void OpcionesFunciones(string item)
         {
             switch (item)
@@ -348,31 +350,28 @@ END $func$ LANGUAGE plpgsql";
                     break;
                 case "Modificar":
                     gbQuery.Visible = true;
-                    txtQuery.Text = "ALTER ROLE " + nombreRol + " WITH LOGIN" + Environment.NewLine;
+                    txtQuery.Text = "ALTER FUNCTION nomFuncion RENAME TO nuevoNombre";
                     break;
                 default:
                     break;
             }
         }
-
+        //LISTO
         public void OpcionesSequences(string item)
         {
             switch (item)
             {
                 case "Agregar":
                     gbQuery.Visible = true;
-                    txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
-                    txtQuery.Text += "DROP ROLE " + nombreRol;
+                    txtQuery.Text = "CREATE SEQUENCE nomSecuencia START 101";
                     break;
                 case "Eliminar":
                     gbQuery.Visible = true;
-                    txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
-                    txtQuery.Text += "DROP ROLE " + nombreRol;
+                    txtQuery.Text = "DROP SEQUENCE nomSecuencia";
                     break;
                 case "Modificar":
                     gbQuery.Visible = true;
-                    txtQuery.Text = "ALTER ROLE " + nombreRol + " WITH LOGIN" + Environment.NewLine;
-                    txtQuery.Text += "ALTER USER " + nombreRol + " WITH PASSWORD ' '";
+                    txtQuery.Text = "ALTER SEQUENCE nomSecuencia RESTART WITH 105";
                     break;
                 default:
                     break;
@@ -429,6 +428,7 @@ EXECUTE PROCEDURE nomProcedure;";
                     break;
             }
         }
+        //LISTO
         public void OpcionesViews(string item)
         {
             switch (item)
@@ -451,7 +451,7 @@ EXECUTE PROCEDURE nomProcedure;";
                     break;
             }
         }
-
+        //LISTO
         public void OpcionesIndex(string item)
         {
             switch (item)
@@ -463,15 +463,34 @@ EXECUTE PROCEDURE nomProcedure;";
                     break;
                 case "Modificar":
                     gbQuery.Visible = true;
-                    txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
-                    txtQuery.Text += "DROP ROLE " + nombreRol;
+                    txtQuery.Text = "ALTER INDEX nombreIndex RENAME TO nuevoNom";
                     break;
-
                 case "Eliminar":
                     gbQuery.Visible = true;
                     txtQuery.Text = "DROP INDEX nomIndex ON nomTabla";
                     break;
+                default:
+                    break;
+            }
+        }
 
+        //LISTO
+        public void OpcionesColumn(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER TABLE nomTabla ADD nomColumn text";
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER TABLE nomTabla ALTER COLUMN nomColumn TYPE varchar(20)";
+                    break;
+                case "Eliminar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER TABLE nomTabla DROP COLUMN nomColumn";
+                    break;
                 default:
                     break;
             }
@@ -496,7 +515,7 @@ EXECUTE PROCEDURE nomProcedure;";
                         if (listaBD[i].ToString() != "postgres")
                         {
                             nombre = listaBD[i].ToString();
-                            CrearOpcion("querItemDBs", "Query");
+                            CrearOpcion("queryItemDBs", "Query");
                             CrearOpcion("eliminarItemDBs", "Eliminar");
                             CrearOpcion("modificarItemDBs", "Modificar");
                             CrearOpcion("refrescarItemDBs", "Refrescar");
@@ -568,11 +587,62 @@ EXECUTE PROCEDURE nomProcedure;";
                 CrearOpcion("modificarIndex", "Modificar");
                 CrearOpcion("eliminarIndex", "Eliminar");
             }
+            if (e.Node.Text == "Columns")
+            {
+                CrearOpcion("agregarColumns", "Agregar");
+                CrearOpcion("modificarColumns", "Modificar");
+                CrearOpcion("eliminarColumns", "Eliminar");
+            }
         }
 
         private void Click_BtnPlay(object sender, EventArgs e)
         {
-            MessageBox.Show(txtQuery.SelectedText);
+            try
+            {
+                if (dgvSelect.DataSource != null)
+                {
+                    DataTable dt = (DataTable)dgvSelect.DataSource;
+                    dt.Clear();
+                    dgvSelect.Columns.Clear();
+                }
+                Char[] selectChar;
+                string query = txtQuery.Text.Trim();
+                selectChar = query.ToCharArray();
+                string s = selectChar[0].ToString() + selectChar[1].ToString() + selectChar[2].ToString() + selectChar[3].ToString() + selectChar[4].ToString() + selectChar[5].ToString();
+                if (s.ToLower().Equals("select"))
+                {
+                    CargarTablaDB();
+                }
+                else
+                {
+                    MessageBox.Show(bol.Query(nombre, txtQuery.SelectedText));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        private void CargarTablaDB()
+        {
+            SelectQuery(nombre, txtQuery.SelectedText);
+        }
+
+        private void SelectQuery(string bd, string query)
+        {
+            Configuracion.ConStr = "Server=127.0.0.1;Port=5432;User Id=" + Usuario.User + ";Password=" + Usuario.Pass + ";Database=" + bd + ";Pooling=false";
+
+            using (NpgsqlConnection con = new NpgsqlConnection(Configuracion.ConStr))
+            {
+                con.Open();
+                NpgsqlDataAdapter dataAdapter;
+                dataAdapter = new NpgsqlDataAdapter(query, con);
+                NpgsqlCommandBuilder commandBuilder = new NpgsqlCommandBuilder(dataAdapter);
+                DataTable table = new DataTable();
+                table.Locale = System.Globalization.CultureInfo.InvariantCulture;
+                dataAdapter.Fill(table);
+                dgvSelect.DataSource = table;
+            }
         }
     }
 }

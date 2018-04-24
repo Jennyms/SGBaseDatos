@@ -23,6 +23,27 @@ namespace SDBaseDatosDAL
             }
         }
 
+        public string EjecutarSelectQuery(string bd, string query)
+        {
+            Configuracion.ConStr = "Server=127.0.0.1;Port=5432;User Id=" + Usuario.User + ";Password=" + Usuario.Pass + ";Database=" + bd;
+
+            using (NpgsqlConnection con = new NpgsqlConnection(Configuracion.ConStr))
+            {
+                con.Open();
+                try
+                {
+                    string sql = query;
+                    NpgsqlCommand cmd = new NpgsqlCommand(sql, con);
+                    cmd.ExecuteNonQuery();
+                    return "Query successful";
+                }
+                catch (NpgsqlException ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
+        }
+
         public string EjecutarQuery(string bd, string query)
         {
             Configuracion.ConStr = "Server=127.0.0.1;Port=5432;User Id=" + Usuario.User + ";Password=" + Usuario.Pass + ";Database=" + bd;
@@ -34,14 +55,13 @@ namespace SDBaseDatosDAL
                 {
                     string sql = query;
                     NpgsqlCommand cmd = new NpgsqlCommand(sql, con);
-                    NpgsqlDataReader reader = cmd.ExecuteReader();
-
+                    cmd.ExecuteNonQuery();
                     return "Query successful";
                 }
-                catch(NpgsqlException ex)
+                catch (NpgsqlException ex)
                 {
                     throw new Exception(ex.Message);
-                }  
+                }
             }
         }
 
@@ -125,6 +145,28 @@ namespace SDBaseDatosDAL
                 con.Close();
             }
             return listaSchemasBD;
+        }
+
+        public NpgsqlDataAdapter SelectQuery(string bd, string query)
+        {
+            Configuracion.ConStr = "Server=127.0.0.1;Port=5432;User Id=" + Usuario.User + ";Password=" + Usuario.Pass + ";Database=" + bd;
+
+            using (NpgsqlConnection con = new NpgsqlConnection(Configuracion.ConStr))
+            {
+                con.Open();
+                string sql = query;
+                NpgsqlDataAdapter dataAdapter = new NpgsqlDataAdapter();
+                dataAdapter.SelectCommand = new NpgsqlCommand(sql, con);
+                
+                if(dataAdapter != null)
+                {
+                    return dataAdapter;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public ArrayList CargarTablesBD(string bd, string schema)
