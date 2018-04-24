@@ -22,6 +22,29 @@ namespace SDBaseDatosDAL
                 return true;
             }
         }
+
+        public string EjecutarQuery(string bd, string query)
+        {
+            Configuracion.ConStr = "Server=127.0.0.1;Port=5432;User Id=" + Usuario.User + ";Password=" + Usuario.Pass + ";Database=" + bd;
+
+            using (NpgsqlConnection con = new NpgsqlConnection(Configuracion.ConStr))
+            {
+                con.Open();
+                try
+                {
+                    string sql = query;
+                    NpgsqlCommand cmd = new NpgsqlCommand(sql, con);
+                    NpgsqlDataReader reader = cmd.ExecuteReader();
+
+                    return "Query successful";
+                }
+                catch(NpgsqlException ex)
+                {
+                    throw new Exception(ex.Message);
+                }  
+            }
+        }
+
         public ArrayList CargarBD()
         {
             ArrayList listaBD = new ArrayList();

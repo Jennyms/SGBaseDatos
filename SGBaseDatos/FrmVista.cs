@@ -22,7 +22,7 @@ namespace SGBaseDatos
         private string nombre;
         private string nombreSchemas;
         private string nombreRol;
-
+        private string nombreTabla;
         public FrmVista()
         {
             InitializeComponent();
@@ -179,12 +179,12 @@ namespace SGBaseDatos
                 OpcionDB(item.Text);
             }
 
-            else if (item.Name == "querItemDBs" || item.Name == "eliminarItemDBs" || item.Name == "refrescarItemDBs")
+            else if (item.Name == "querItemDBs" || item.Name == "eliminarItemDBs" || item.Name == "refrescarItemDBs" || item.Name == "modificarItemDBs")
             {
                 OpcionesDB(item.Text);
             }
 
-            else if (item.Name == "agregarSchemas" || item.Name == "eliminarSchemas" || item.Name == "refrescarSchemas")
+            else if (item.Name == "agregarSchemas" || item.Name == "eliminarSchemas" || item.Name == "refrescarSchemas" || item.Name == "modificarSchemas")
             {
                 OpcionesSchemasDB(item.Text);
             }
@@ -198,21 +198,49 @@ namespace SGBaseDatos
             {
                 OpcionesRoles(item.Text);
             }
+
+            else if (item.Name == "agregarFun" || item.Name == "modificarFun" || item.Name == "eliminarFun")
+            {
+                OpcionesFunciones(item.Text);
+            }
+            else if (item.Name == "agregarSeq" || item.Name == "modificarSeq" || item.Name == "eliminarSeq")
+            {
+                OpcionesSequences(item.Text);
+            }
+            else if (item.Name == "agregarTabla" || item.Name == "modificarTabla" || item.Name == "eliminarTabla")
+            {
+                OpcionesTabla(item.Text);
+            }
+            else if (item.Name == "agregarTri" || item.Name == "modificarTri" || item.Name == "eliminarTri")
+            {
+                OpcionesTriggers(item.Text);
+            }
+            else if (item.Name == "agregarViews" || item.Name == "modificarViews" || item.Name == "eliminarViews")
+            {
+                OpcionesViews(item.Text);
+            }
+            else if (item.Name == "agregarIndex" || item.Name == "modificarIndex" || item.Name == "eliminarIndex")
+            {
+                OpcionesIndex(item.Text);
+            }
         }
 
         public void OpcionesSchemasDB(string item)
         {
+            gbQuery.Visible = true;
             switch (item)
             {
+
                 case "Agregar":
-                    gbQuery.Visible = true;
                     txtQuery.Text = "CREATE SCHEMA ingreseElNombre";
                     break;
-                case "Elimminar":
+                case "Eliminar":
                     txtQuery.Text = "DROP SCHEMA " + nombreSchemas;
                     break;
+                case "Modificar":
+                    txtQuery.Text = "ALTER SCHEMA " + nombreSchemas;
+                    break;
                 case "Refrescar":
-                    gbQuery.Visible = true;
                     tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
                     tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
                     tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
@@ -223,17 +251,17 @@ namespace SGBaseDatos
             }
         }
 
-
+        //LISTO
         public void OpcionDB(string item)
         {
+            gbQuery.Visible = true;
             switch (item)
             {
+
                 case "Agregar":
-                    gbQuery.Visible = true;
-                    txtQuery.Text = "CREATE DATABASE ingreseElNombre";
+                    txtQuery.Text = "CREATE DATABASE nomDB";
                     break;
                 case "Refrescar":
-                    gbQuery.Visible = true;
                     tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
                     tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
                     tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
@@ -244,7 +272,7 @@ namespace SGBaseDatos
                     break;
             }
         }
-
+        //LISTO
         public void OpcionesDB(string item)
         {
             switch (item)
@@ -252,8 +280,13 @@ namespace SGBaseDatos
                 case "Query":
                     gbQuery.Visible = true;
                     break;
-                case "Elimminar":
+                case "Eliminar":
+                    gbQuery.Visible = true;
                     txtQuery.Text = "DROP DATABASE " + nombre;
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER DATABASE " + nombre + " RENAME TO nuevoNombre";
                     break;
                 case "Refrescar":
                     gbQuery.Visible = true;
@@ -285,6 +318,7 @@ namespace SGBaseDatos
             switch (item)
             {
                 case "Elimminar":
+                    gbQuery.Visible = true;
                     txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
                     txtQuery.Text += "DROP ROLE " + nombreRol;
                     break;
@@ -298,6 +332,150 @@ namespace SGBaseDatos
             }
         }
 
+        public void OpcionesFunciones(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = @"CREATE FUNCTION sumar(integer,integer) RETURNS integer AS $func$ BEGIN
+RETURN $1 +$2; 
+END $func$ LANGUAGE plpgsql";
+                    break;
+                case "Eliminar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP FUNCTION nameFunction";
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER ROLE " + nombreRol + " WITH LOGIN" + Environment.NewLine;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void OpcionesSequences(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
+                    txtQuery.Text += "DROP ROLE " + nombreRol;
+                    break;
+                case "Eliminar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
+                    txtQuery.Text += "DROP ROLE " + nombreRol;
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER ROLE " + nombreRol + " WITH LOGIN" + Environment.NewLine;
+                    txtQuery.Text += "ALTER USER " + nombreRol + " WITH PASSWORD ' '";
+                    break;
+                default:
+                    break;
+            }
+        }
+        //LISTO
+        public void OpcionesTabla(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = @"CREATE TABLE nomTable (
+)";
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "UPDATE nomTable SET ";
+                    break;
+
+                case "Eliminar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP TABLE nomTable";
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        //LISTO
+        public void OpcionesTriggers(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = @"CREATE TRIGGER nomTrigger
+AFTER INSERT OR UPDATE OR DELETE
+ON nomTabla
+FOR EACH ROW 
+EXECUTE PROCEDURE nomProcedure;";
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER TRIGGER nomTrigger ON nomTable RENAME TO nuev";
+                    break;
+
+                case "Eliminar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP TRIGGER name ON nomTable";
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        public void OpcionesViews(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "CREATE VIEW nomView AS SELECT nomColumnas FROM nomTabla";
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "ALTER VIEW nombreOld RENAME TO nombreNew";
+                    break;
+
+                case "Eliminar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP VIEW nomView";
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        public void OpcionesIndex(string item)
+        {
+            switch (item)
+            {
+                case "Agregar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = @"CREATE INDEX nomIndex
+    ON nomTabla(columnaDeTabla ASC NULLS LAST)";
+                    break;
+                case "Modificar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP USER " + nombreRol + Environment.NewLine;
+                    txtQuery.Text += "DROP ROLE " + nombreRol;
+                    break;
+
+                case "Eliminar":
+                    gbQuery.Visible = true;
+                    txtQuery.Text = "DROP INDEX nomIndex ON nomTabla";
+                    break;
+
+                default:
+                    break;
+            }
+        }
 
         private void Click_NodoEscogido(object sender, TreeNodeMouseClickEventArgs e)
         {
@@ -315,11 +493,12 @@ namespace SGBaseDatos
                 {
                     if (e.Node.Text == listaBD[i].ToString())
                     {
-                        if(listaBD[i].ToString() != "postgres")
+                        if (listaBD[i].ToString() != "postgres")
                         {
                             nombre = listaBD[i].ToString();
                             CrearOpcion("querItemDBs", "Query");
-                            CrearOpcion("eliminarItemDBs", "Elimminar");
+                            CrearOpcion("eliminarItemDBs", "Eliminar");
+                            CrearOpcion("modificarItemDBs", "Modificar");
                             CrearOpcion("refrescarItemDBs", "Refrescar");
                         }
                     }
@@ -329,7 +508,8 @@ namespace SGBaseDatos
             {
                 nombreSchemas = e.Node.Text;
                 CrearOpcion("agregarSchemas", "Agregar");
-                CrearOpcion("eliminarSchemas", "Elimminar");
+                CrearOpcion("eliminarSchemas", "Eliminar");
+                CrearOpcion("modificarSchemas", "Modificar");
                 CrearOpcion("refrescarSchemas", "Refrescar");
             }
             if (e.Node.Text == "Login/Group Roles")
@@ -337,20 +517,57 @@ namespace SGBaseDatos
                 nombreRol = e.Node.Text;
                 CrearOpcion("agregarRoles", "Agregar");
             }
-            if(listaUsersBD != null)
+            if (listaUsersBD != null)
             {
                 for (int i = 0; i < listaUsersBD.Count; i++)
                 {
-                    if(e.Node.Text == listaUsersBD[i].ToString())
+                    if (e.Node.Text == listaUsersBD[i].ToString())
                     {
                         nombreRol = listaUsersBD[i].ToString();
                         CrearOpcion("modificarRol", "Modificar");
-                        CrearOpcion("eliminarRol", "Elimminar");
+                        CrearOpcion("eliminarRol", "Eliminar");
                     }
-                    
+
                 }
             }
-            
+            if (e.Node.Text == "Functions")
+            {
+                CrearOpcion("agregarFun", "Agregar");
+                CrearOpcion("modificarFun", "Modificar");
+                CrearOpcion("eliminarFun", "Eliminar");
+
+            }
+            if (e.Node.Text == "Sequences")
+            {
+                CrearOpcion("agregarSeq", "Agregar");
+                CrearOpcion("modificarSeq", "Modificar");
+                CrearOpcion("eliminarSeq", "Eliminar");
+
+            }
+            if (e.Node.Text == "Tables")
+            {
+                CrearOpcion("agregarTabla", "Agregar");
+                CrearOpcion("modificarTabla", "Modificar");
+                CrearOpcion("eliminarTabla", "Eliminar");
+            }
+            if (e.Node.Text == "Triggers")
+            {
+                CrearOpcion("agregarTri", "Agregar");
+                CrearOpcion("modificarTri", "Modificar");
+                CrearOpcion("eliminarTri", "Eliminar");
+            }
+            if (e.Node.Text == "Views")
+            {
+                CrearOpcion("agregarViews", "Agregar");
+                CrearOpcion("modificarViews", "Modificar");
+                CrearOpcion("eliminarViews", "Eliminar");
+            }
+            if (e.Node.Text == "Indexes")
+            {
+                CrearOpcion("agregarIndex", "Agregar");
+                CrearOpcion("modificarIndex", "Modificar");
+                CrearOpcion("eliminarIndex", "Eliminar");
+            }
         }
 
         private void Click_BtnPlay(object sender, EventArgs e)
