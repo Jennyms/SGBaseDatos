@@ -112,6 +112,7 @@ namespace SGBaseDatos
                             tvSGBD.Nodes[0].Nodes[0].Nodes[0].Nodes[i].Nodes[0].Nodes[j].Nodes[2].Nodes.Add(listaTables[y].ToString());
                             tvSGBD.Nodes[0].Nodes[0].Nodes[0].Nodes[i].Nodes[0].Nodes[j].Nodes[2].Nodes[y].Nodes.Add("Columns");
                             tvSGBD.Nodes[0].Nodes[0].Nodes[0].Nodes[i].Nodes[0].Nodes[j].Nodes[2].Nodes[y].Nodes.Add("Indexes");
+                            tvSGBD.Nodes[0].Nodes[0].Nodes[0].Nodes[i].Nodes[0].Nodes[j].Nodes[2].Nodes[y].Nodes.Add("Constraints");
                             //Columns
                             ArrayList listaColumns = bol.CargarColumnsBD(listaBD[i].ToString(), listaSquemas[j].ToString(), listaTables[y].ToString());
                             for (int x = 0; x < listaColumns.Count; x++)
@@ -124,6 +125,13 @@ namespace SGBaseDatos
                             {
                                 tvSGBD.Nodes[0].Nodes[0].Nodes[0].Nodes[i].Nodes[0].Nodes[j].Nodes[2].Nodes[y].Nodes[1].Nodes.Add(listaIndex[x].ToString());
                             }
+                            //Constraints
+                            ArrayList listaConstraints = bol.CargarConstraintsBD(listaBD[i].ToString(), listaTables[y].ToString());
+                            for (int z = 0; z < listaIndex.Count; z++)
+                            {
+                                tvSGBD.Nodes[0].Nodes[0].Nodes[0].Nodes[i].Nodes[0].Nodes[j].Nodes[2].Nodes[y].Nodes[2].Nodes.Add(listaIndex[z].ToString());
+                            }
+
                         }
                         //Triggers
                         ArrayList listaTriggers = bol.CargarTriggersBD(listaBD[i].ToString(), listaSquemas[j].ToString());
@@ -224,7 +232,39 @@ namespace SGBaseDatos
             {
                 OpcionesColumn(item.Text);
             }
+            else if (item.Name == "agregarConstraints" || item.Name == "modificarConstraints" || item.Name == "eliminarConstraints")
+            {
+                OpcionesConstraints(item.Text);
+            }
         }
+
+        //LISTO
+        public void OpcionesConstraints(string item)
+        {
+            gbQuery.Visible = true;
+            switch (item)
+            {
+
+                case "Agregar":
+                    txtQuery.Text = "CREATE CONSTRAINTS nomEsquema";
+                    break;
+                case "Eliminar":
+                    txtQuery.Text = "DROP CONSTRAINTS nomEsquema";
+                    break;
+                case "Modificar":
+                    txtQuery.Text = "ALTER CONSTRAINTS nomEsquema RENAME TO nuevoNombre";
+                    break;
+                case "Refrescar":
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    tvSGBD.Nodes[0].Nodes[0].Nodes.RemoveAt(0);
+                    CargarTodo();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         //LISTO
         public void OpcionesSchemasDB(string item)
         {
@@ -592,6 +632,12 @@ EXECUTE PROCEDURE nomProcedure;";
                 CrearOpcion("agregarColumns", "Agregar");
                 CrearOpcion("modificarColumns", "Modificar");
                 CrearOpcion("eliminarColumns", "Eliminar");
+            }
+            if (e.Node.Text == "Constraints")
+            {
+                CrearOpcion("agregarConstraints", "Agregar");
+                CrearOpcion("modificarConstraints", "Modificar");
+                CrearOpcion("eliminarConstraints", "Eliminar");
             }
         }
 

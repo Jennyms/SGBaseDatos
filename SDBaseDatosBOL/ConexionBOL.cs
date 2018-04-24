@@ -178,5 +178,10 @@ namespace SDBaseDatosBOL
             }
             return dal.SelectQuery(bd, query);
         }
+
+        public ArrayList CargarConstraintsBD(string bd, string table)
+        {
+            return dal.CargarConstraintsBD(bd, table);
+        }
     }
 }

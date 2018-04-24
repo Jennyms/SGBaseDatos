@@ -157,8 +157,8 @@ namespace SDBaseDatosDAL
                 string sql = query;
                 NpgsqlDataAdapter dataAdapter = new NpgsqlDataAdapter();
                 dataAdapter.SelectCommand = new NpgsqlCommand(sql, con);
-                
-                if(dataAdapter != null)
+
+                if (dataAdapter != null)
                 {
                     return dataAdapter;
                 }
@@ -307,6 +307,26 @@ namespace SDBaseDatosDAL
                 con.Close();
             }
             return listaIndex;
+        }
+
+        public ArrayList CargarConstraintsBD(string bd, string table)
+        {
+            ArrayList lista = new ArrayList();
+            Configuracion.ConStr = "Server=127.0.0.1;Port=5432;User Id=" + Usuario.User + ";Password=" + Usuario.Pass + ";Database=" + bd;
+
+            using (NpgsqlConnection con = new NpgsqlConnection(Configuracion.ConStr))
+            {
+                con.Open();
+                string sql = "SELECT conname FROM pg_constraint WHERE conrelid = '" + table + "' ::regclass::oid";
+                NpgsqlCommand cmd = new NpgsqlCommand(sql, con);
+                NpgsqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    lista.Add(reader.GetString(0));
+                }
+                con.Close();
+            }
+            return lista;
         }
     }
 }
